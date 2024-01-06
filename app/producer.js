@@ -13,9 +13,10 @@ const run = async () => {
   await producer.connect();
   for (let index = 0; index < 5; index += 1) {
     await producer.send({
-      topic: 'test-topic',
+      topic: 'first_topic',
       messages: [
-        { value: 'Hello KafkaJS user!' },
+        { key: 'partition1', value: 'Hello KafkaJS user 1!', partition: 1 },
+        { key: 'partition0', value: 'Hello KafkaJS user 0!', partition: 0 },
       ],
     });
   }
