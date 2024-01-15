@@ -1,5 +1,7 @@
 # Kafka Tutorial
 
+https://www.conduktor.io/kafka
+
 ## Open Source Kafka Startup in local
 
 1. Start Zookeeper Server
@@ -90,7 +92,7 @@
 
 8. Unclean Leader Election
 
-- Enable `unclean.leader.election.enable=true` and start producing to non-ISR partitions. We are going to lose all messages that were written to the old leader while that replica was out of sync and also cause some inconsistencies in consumers.
+- Enable `unclean.leader.election.enable=true` Unclean leader elections are enabled by default on older versions of Kafka, but they can lead to data loss. If you enable unclean leader elections (or leave them enabled), perform duplicate writes to a secondary cluster if possible
 
     ```sh
     kafka-configs.sh --bootstrap-server localhost:9092 --alter --entity-type topics --entity-name configured-topic --add-config unclean.leader.election.enable=true
@@ -98,4 +100,16 @@
 
 9. Log Compaction
 
--
+- **`log.cleanup.policy= delete`** : This is the default for all the user topics. With this policy configured for a topic, Kafka deletes events older than the configured retention time. The default retention period is a week
+- **`log.cleanup.policy=compact`** :with the property to only retain at least the most recent value for each key in the partition
+  ![Log Compaction](./public/images/Adv_Kafka_Topic_Log_Comp_2.webp)
+
+- Create topic with `cleanup.policy=compact`
+
+  ```sh
+  kafka-topics.sh --bootstrap-server localhost:9092 --create --topic employee-salary \
+    --partitions 1 --replication-factor 1 \
+    --config cleanup.policy=compact \
+    --config min.cleanable.dirty.ratio=0.001 \
+    --config segment.ms=5000
+  ```
